@@ -12,7 +12,7 @@ RUN apt-get update && \
                     libbz2-dev \
                     -y
 
-# build conda environment with required r packages & install RStudio into it
+# build conda environment with required r packages & install RStudio into it 
 COPY r-bio.yaml /tmp
 RUN conda env create --file /tmp/r-bio.yaml
 
