@@ -39,7 +39,7 @@ RUN conda run -n r-bio /bin/bash -c "ln -s /opt/conda/bin/R /usr/bin/R && \
                                       ( echo 'LD_PRELOAD=/opt/k8s-support/lib/libnss_wrapper.so'; echo 'NSS_WRAPPER_PASSWD=/tmp/passwd.wrap'; echo 'NSS_WRAPPER_GROUP=/tmp/group.wrap' ) >> /opt/conda/envs/r-bio/bin/R/etc/Renviron.site && \
 									  ipython kernel install --name=r-bio"
 
-# create py-bio conda environment with required python packages
+# create py-bio conda environment with required python packages 
 COPY py-bio.yaml /tmp
 RUN conda env create --file /tmp/py-bio.yaml && \
     conda run -n py-bio /bin/bash -c "ipython kernel install --name=py-bio"
