@@ -44,11 +44,79 @@ COPY py-bio.yaml /tmp
 RUN conda env create --file /tmp/py-bio.yaml && \
     conda run -n py-bio /bin/bash -c "ipython kernel install --name=py-bio"
 
-# STAR
-RUN wget https://github.com/alexdobin/STAR/archive/2.5.2b.zip -P /tmp && \
-    unzip /tmp/2.5.2b.zip && \
-    mv STAR-* /opt/ && \
-    rm -rf /tmp/*.zip
+# Venn Diagrams
+RUN conda install --quiet --yes matplotlib-venn
+RUN python3 -m pip install matplotlib-venn
+
+# Install GATK
+RUN pwd && \
+    apt-get update && \
+    apt-get install --yes default-jdk && \
+    cd /opt && \
+    wget -q https://github.com/broadinstitute/gatk/releases/download/4.1.4.1/gatk-4.1.4.1.zip && \
+    unzip -q gatk-4.1.4.1.zip && \
+    ln -s /opt/gatk-4.1.4.1/gatk /usr/bin/gatk && \
+    rm gatk-4.1.4.1.zip && \
+    cd /opt/gatk-4.1.4.1 && \
+    ls -al  && \
+    cd /home/jovyan
+
+# install vcftools
+RUN apt-get install --yes build-essential autoconf pkg-config zlib1g-dev && \
+    cd /tmp && \
+    wget -q -O vcftools.tar.gz https://github.com/vcftools/vcftools/releases/download/v0.1.16/vcftools-0.1.16.tar.gz && \
+#    ls -al && \
+    tar -xvf vcftools.tar.gz && \
+    cd vcftools-0.1.16 && \
+#    ls -al && \
+    ./autogen.sh && \
+    ./configure && \
+    make && \
+    make install && \
+    rm -f /tmp/vcftools.tar.gz
+
+# install samtools
+RUN apt-get install --yes ncurses-dev libbz2-dev liblzma-dev && \
+    cd /opt && \
+    wget -q https://github.com/samtools/samtools/releases/download/1.10/samtools-1.10.tar.bz2 && \
+    tar xvfj samtools-1.10.tar.bz2 && \
+    cd samtools-1.10 && \
+    ./configure && \
+    make && \
+    make install
+
+# install bcftools
+RUN apt-get install --yes ncurses-dev libbz2-dev liblzma-dev && \
+    cd /opt && \
+    wget -q https://github.com/samtools/bcftools/releases/download/1.10.2/bcftools-1.10.2.tar.bz2 && \
+    tar xvfj bcftools-1.10.2.tar.bz2 && \
+    cd bcftools-1.10.2 && \
+    ./configure && \
+    make && \
+    make install
+
+# install htslib
+RUN apt-get install --yes ncurses-dev libbz2-dev liblzma-dev && \
+    cd /opt && \
+    wget -q https://github.com/samtools/htslib/releases/download/1.10.2/htslib-1.10.2.tar.bz2 && \
+    tar xvfj htslib-1.10.2.tar.bz2 && \
+    cd htslib-1.10.2 && \
+    ./configure && \
+    make && \
+    make install
+
+# Install TrimGalore and cutadapt
+RUN wget http://www.bioinformatics.babraham.ac.uk/projects/trim_galore/trim_galore_v0.4.1.zip -P /tmp/ && \
+    unzip /tmp/trim_galore_v0.4.1.zip && \
+    rm /tmp/trim_galore_v0.4.1.zip && \
+    mv trim_galore_zip /opt/
+
+RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
+    python2 get-pip.py && \
+    python2 -m pip install Cython
+
+# path /opt/conda/bin/cutadapt
+RUN python3 -m pip install --upgrade cutadapt
 
 # FastQC
 RUN wget http://www.bioinformatics.babraham.ac.uk/projects/fastqc/fastqc_v0.11.5.zip -P /tmp && \
@@ -56,6 +124,30 @@ RUN wget http://www.bioinformatics.babraham.ac.uk/projects/fastqc/fastqc_v0.11.5
     mv FastQC /opt/ && \
     chmod 755 /opt/FastQC/fastqc && \
     rm -rf /tmp/fastqc_*
+
+# STAR
+RUN wget https://github.com/alexdobin/STAR/archive/2.5.2b.zip -P /tmp && \
+    unzip /tmp/2.5.2b.zip && \
+    mv STAR-* /opt/ && \
+    rm -rf /tmp/*.zip
+
+# Picard
+RUN wget http://downloads.sourceforge.net/project/picard/picard-tools/1.88/picard-tools-1.88.zip -P /tmp && \
+    unzip /tmp/picard-tools-1.88.zip && \
+    mv picard-tools-* /opt/ && \
+    rm /tmp/picard-tools-1.88.zip
+
+# SRA Tools
+RUN wget https://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/2.10.8/sratoolkit.2.10.8-centos_linux64.tar.gz -P /tmp && \
+    tar xvf /tmp/sratoolkit* && \
+    mv sratoolkit* /opt/ && \
+    rm -rf /tmp/*.tar.gz
+
+RUN wget https://github.com/pachterlab/kallisto/releases/download/v0.42.4/kallisto_linux-v0.42.4.tar.gz -P /tmp && \
+    tar -xvf /tmp/kallisto_linux-v0.42.4.tar.gz && \
+    mv kallisto_* /opt/ && \
+    rm /tmp/kallisto_linux-v0.42.4.tar.gz
+
 
 # set r-bio as default
 COPY run_jupyter.sh /
