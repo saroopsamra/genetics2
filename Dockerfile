@@ -118,7 +118,7 @@ RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
 # path /opt/conda/bin/cutadapt
 RUN python3 -m pip install --upgrade cutadapt
 
-# FastQC
+# FastQC 
 RUN wget http://www.bioinformatics.babraham.ac.uk/projects/fastqc/fastqc_v0.11.5.zip -P /tmp && \
     unzip /tmp/fastqc_v0.11.5.zip && \
     mv FastQC /opt/ && \
