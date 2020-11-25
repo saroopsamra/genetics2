@@ -22,3 +22,4 @@ dependencies:
 - htseq
 - bwa
 - bwa-mem2
+- gplots
